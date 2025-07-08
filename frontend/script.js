@@ -6,40 +6,41 @@ async function analyzeComplaint() {
     return;
   }
 
-  // Show loading text while waiting for backend
+  // Show loading message
   document.getElementById('json-output').innerText = "Analyzing...";
   document.getElementById('email-output').innerText = "";
 
   try {
-    const response = await fetch('http://127.0.0.1:5000/analyze', {
+    const response = await fetch('https://complaint-analyzer-and-response.onrender.com/analyze', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ complaint })
+      body: JSON.stringify({ complaint: complaint })
     });
 
     const data = await response.json();
 
     if (data.error) {
-      document.getElementById('json-output').innerText = "Error: " + data.error;
-      return;
+      document.getElementById('json-output').innerText = "❌ Error: " + data.error;
+      document.getElementById('email-output').innerText = "";
+    } else {
+      // Convert the raw JSON string from Gemini into a JS object
+      const result = JSON.parse(data.result);
+
+      // Display analysis result as formatted JSON
+      document.getElementById('json-output').innerText = JSON.stringify({
+        issue_category: result.issue_category,
+        sentiment: result.sentiment,
+        summary: result.summary
+      }, null, 2);
+
+      // Show draft email response
+      document.getElementById('email-output').innerText = result.response;
     }
 
-    // Parse Gemini's stringified JSON response
-    const result = JSON.parse(data.result);
-
-    // Display structured analysis
-    document.getElementById('json-output').innerText = JSON.stringify({
-      issue_category: result.issue_category,
-      sentiment: result.sentiment,
-      summary: result.summary
-    }, null, 2);
-
-    // Display email response
-    document.getElementById('email-output').innerText = result.response;
-
-  } catch (error) {
-    document.getElementById('json-output').innerText = "Error: " + error.message;
+  } catch (err) {
+    document.getElementById('json-output').innerText = "❌ Network or server error: " + err.message;
+    document.getElementById('email-output').innerText = "";
   }
 }
