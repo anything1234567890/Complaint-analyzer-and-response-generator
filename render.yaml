@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: complaint-analyzer-backend
+    env: python
+    region: oregon
+    buildCommand: pip install -r requirements.txt
+    startCommand: python app.py
+    rootDir: backend
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
