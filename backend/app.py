@@ -14,7 +14,7 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 # Step 3: Configure Gemini
 genai.configure(api_key=GEMINI_API_KEY)
-model = genai.GenerativeModel("gemini-pro")
+model = genai.GenerativeModel("gemini-1.5-flash")
 
 # Step 4: Route to analyze complaints
 @app.route('/analyze', methods=['POST'])
@@ -52,7 +52,12 @@ Complaint:
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# Step 5: Run the app
+
+
+# Other code above (Flask, routes, etc.)
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    import os
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
 
